@@ -20,9 +20,19 @@ body {
     transition: background-color 0.3s;
 }
 
+#content div h1 {
+    /*    居中显示*/
+    text-align: center;
+}
+
 .navbar a:hover {
     background-color: #ddd;
     color: black;
+}
+
+.nav-cur {
+    background-color: #ddd;
+    color: black !important;
 }
 
 .content {
@@ -36,7 +46,6 @@ body {
     border: 1px solid #e0e0e0;
     background-color: #fafafa;
 }
-
 
 
 body {
@@ -125,7 +134,7 @@ body {
 
 .nft-button {
     width: 80%;
-    max-width: 400px;
+    max-width: 300px;
     padding: 14px 16px;
     background-color: #333;
     color: #f2f2f2;
@@ -151,50 +160,51 @@ body {
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-  }
-  
-  #myNFT .nft-item:hover {
+}
+
+#myNFT .nft-item:hover {
     transform: scale(1.05);
-  }
-  
-  #myNFT .nft-image {
+}
+
+#myNFT .nft-image {
     width: 150px;
     height: 150px;
     border-radius: 10px;
     overflow: hidden;
-  }
-  
-  #myNFT .nft-details {
+}
+
+#myNFT .nft-details {
     margin-left: 20px;
     flex-grow: 1;
-  }
-  
-  #myNFT .nft-details div {
+}
+
+#myNFT .nft-details div {
     margin: 10px 0;
     font-size: 18px;
-  }
-  
-  #myNFT .nft-price {
+}
+
+#myNFT .nft-price {
     display: flex;
     align-items: center;
-  }
-  
-  #myNFT .nft-price input {
+}
+
+#myNFT .nft-price input {
     margin-left: 5px;
     width: 150px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-  }
-  #myNFT .nft-duration input{
+}
+
+#myNFT .nft-duration input {
     margin-left: 5px;
     width: 150px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-  }
-  
-  #myNFT .nft-auction-button {
+}
+
+#myNFT .nft-auction-button {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -202,13 +212,13 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
-  
-  #myNFT .nft-auction-button:hover {
+}
+
+#myNFT .nft-auction-button:hover {
     background-color: #0056b3;
-  }
-  
-  /* MyAuction样式 */
+}
+
+/* MyAuction样式 */
 #myAuction .nft-item {
     display: flex;
     align-items: center;
@@ -218,50 +228,51 @@ body {
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-  }
-  
-  #myAuction .nft-item:hover {
+}
+
+#myAuction .nft-item:hover {
     transform: scale(1.05);
-  }
-  
-  #myAuction .nft-image {
+}
+
+#myAuction .nft-image {
     width: 150px;
     height: 150px;
     border-radius: 10px;
     overflow: hidden;
-  }
-  
-  #myAuction .nft-details {
+}
+
+#myAuction .nft-details {
     margin-left: 20px;
     flex-grow: 1;
-  }
-  
-  #myAuction .nft-details div {
+}
+
+#myAuction .nft-details div {
     margin: 10px 0;
     font-size: 18px;
-  }
-  
-  #myAuction .nft-price {
+}
+
+#myAuction .nft-price {
     display: flex;
     align-items: center;
-  }
-  
-  #myAuction .nft-price input {
+}
+
+#myAuction .nft-price input {
     margin-left: 5px;
     width: 150px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-  }
-  #myAuction .nft-duration input{
+}
+
+#myAuction .nft-duration input {
     margin-left: 5px;
     width: 150px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-  }
-  
-  #myAuction .nft-auction-button {
+}
+
+#myAuction .nft-auction-button {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -269,9 +280,85 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
-  
-  #myAuction .nft-auction-button:hover {
+}
+
+#myAuction .nft-auction-button:hover {
     background-color: #0056b3;
-  }
-  
+}
+
+.startButton, .endButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+/*NFTMarket样式*/
+#nftMarket .nft-item {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#nftMarket .nft-item:hover {
+    transform: scale(1.05);
+}
+
+#nftMarket .nft-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#nftMarket .nft-details {
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
+#nftMarket .nft-details div {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+#nftMarket .nft-price {
+    display: flex;
+    align-items: center;
+}
+
+#nftMarket .nft-price input {
+    margin-left: 5px;
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#nftMarket .nft-duration input {
+    margin-left: 5px;
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#nftMarket .nft-auction-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#nftMarket .nft-auction-button:hover {
+    background-color: #0056b3;
+}

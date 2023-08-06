@@ -102,6 +102,24 @@ tokenAbi = [
         "inputs": [
             {
                 "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "idToRemove",
+                "type": "uint256"
+            }
+        ],
+        "name": "removeIdFromList",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "from",
                 "type": "address"
             },
@@ -256,16 +274,40 @@ tokenAbi = [
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "getIdList",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            },
+            {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "name": "id_list",
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "length",
                 "type": "uint256"
             }
         ],
@@ -335,7 +377,7 @@ tokenAbi = [
         "type": "function"
     }
 ]
-tokenAddress = "0x94c4031b8f5180B887BAcaC8d2202A06B3dE0d43"
+tokenAddress = "0x3e286B4efA89630939a1bD63aC74336137601dE7"
 
 auctionFactoryAbi = [
     {
@@ -448,7 +490,7 @@ auctionFactoryAbi = [
     }
 ]
 
-auctionFactoryAddress = "0x51E0C40dEA6E49410DcC9c2Cd3F296e26a3E76E3"
+auctionFactoryAddress = "0x7bc3F9ea3f9Bd5389aE5108a8Ec3f2AD5fE3B60E"
 
 auctionAbi = [
     {
@@ -494,13 +536,6 @@ auctionAbi = [
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "bid",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
         "anonymous": false,
         "inputs": [
             {
@@ -518,20 +553,6 @@ auctionAbi = [
         ],
         "name": "Bid",
         "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "cancelAuction",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "end",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
     },
     {
         "anonymous": false,
@@ -553,24 +574,10 @@ auctionAbi = [
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "start",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "anonymous": false,
         "inputs": [],
         "name": "Start",
         "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "withdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
     },
     {
         "anonymous": false,
@@ -618,6 +625,13 @@ auctionAbi = [
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "bid",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -638,6 +652,13 @@ auctionAbi = [
     },
     {
         "inputs": [],
+        "name": "cancelAuction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "canceled",
         "outputs": [
             {
@@ -647,6 +668,13 @@ auctionAbi = [
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "end",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -755,6 +783,13 @@ auctionAbi = [
     },
     {
         "inputs": [],
+        "name": "start",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "started",
         "outputs": [
             {
@@ -765,6 +800,13 @@ auctionAbi = [
         ],
         "stateMutability": "view",
         "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     }
 ]
 
@@ -772,60 +814,153 @@ async function getMyAuction() {
     if (window.ethereum) {
         const web3 = new Web3(window.ethereum);
         try {
-            // ask for authorized
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            // 请求用户授权
+            await window.ethereum.request({method: 'eth_requestAccounts'});
 
             const contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
             const accounts = await web3.eth.getAccounts();
-            const current_address = accounts[0]; // First account
+            const current_address = accounts[0]; // 使用第一个账户
             contract.methods.getAllAuctions().call()
                 .then((datas) => {
                     let nfts = []
                     let container = document.getElementById('myAuction');
-                    container.innerHTML = ''; // clean
+                    container.innerHTML = '';
+                    let h1 = document.createElement('h1');
+                    h1.innerHTML = 'My Auction';
+                    container.appendChild(h1);
+                    // Determine whether there is an auction
+                    if (datas.length === 0) {
+                        let p = document.createElement('p');
+                        p.innerHTML = 'No Auction';
+                        // 居中显示
+                        p.style.textAlign = 'center';
+                        container.appendChild(p);
+                    }
+
                     datas.forEach((auction_address, index) => {
                         const auction_contract = new web3.eth.Contract(auctionAbi, auction_address);
-                        // Get NFT ID
+                        // 获取NFT ID
                         auction_contract.methods.nftId().call()
                             .then(nftId => {
-                                // get the highest bidder
+                                // 获取最高出价者
                                 auction_contract.methods.highestBidder().call()
                                     .then(highestBidder => {
                                         auction_contract.methods.highestBid().call()
                                             .then(h_price => {
-                                                console.log("NFT ID:", nftId);
-                                                console.log("Highest Bidder:", highestBidder);
-                                                console.log("Highest price:", h_price);
-                                                
-                                            
+                                                // 获取拍卖结束时间
+                                                auction_contract.methods.endAt().call()
+                                                    .then(endAt => {
+                                                        // 获取owner
+                                                        console.log("截止时间", endAt)
+                                                        auction_contract.methods.owner().call()
+                                                            .then(owner => {
+                                                                if (owner === current_address) {
+                                                                    // 填充页面
 
-                                                let div = document.createElement('div');
-                                                div.className = 'nft-item';
+                                                                    let div = document.createElement('div');
+                                                                    div.className = 'nft-item';
 
-                                                let img = document.createElement('img');
-                                                img.className = 'nft-image';
-                                                img.src = "images/picture-01.jpg"
-                                                div.appendChild(img);
+                                                                    let img = document.createElement('img');
+                                                                    img.className = 'nft-image';
+                                                                    img.src = "images/picture-01.jpg"
+                                                                    div.appendChild(img);
 
-                                                let details = document.createElement('div');
-                                                details.className = 'nft-details';
+                                                                    let details = document.createElement('div');
+                                                                    details.className = 'nft-details';
 
-                                                let idDiv = document.createElement('div');
-                                                idDiv.textContent = 'NFT ID: ' + nftId;
-                                                details.appendChild(idDiv);
+                                                                    let idDiv = document.createElement('div');
+                                                                    idDiv.textContent = 'NFT ID: ' + nftId;
+                                                                    details.appendChild(idDiv);
 
-                                                let h_id = document.createElement('div');
-                                                h_id.textContent = 'highestBidder: ' + highestBidder;
-                                                details.appendChild(h_id);
+                                                                    let h_id = document.createElement('div');
+                                                                    h_id.textContent = 'highest Bidder: ' + highestBidder;
+                                                                    details.appendChild(h_id);
 
-                                                let price = document.createElement('div');
-                                                price.textContent = 'h_price: ' + h_price;
-                                                details.appendChild(price);
+                                                                    let price = document.createElement('div');
+                                                                    price.textContent = 'highest price: ' + h_price;
+                                                                    // price后面添加一个粗的单位
+                                                                    let span = document.createElement('span');
+                                                                    span.textContent = ' wei';
+                                                                    span.style.fontWeight = 'bold';
+                                                                    price.appendChild(span);
+                                                                    details.appendChild(price);
+
+                                                                    let end_time = document.createElement("div");
+                                                                    // endAt 1691344532转字符串
+                                                                    if (endAt === "0") {
+                                                                        endAt = "Not start";
+                                                                    }
+                                                                    endAt = new Date(parseInt(endAt) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
+
+                                                                    end_time.textContent = "end time: " + endAt;
+                                                                    details.appendChild(end_time);
+
+                                                                    let address = document.createElement('div');
+                                                                    address.textContent = 'auctionContractAddress: ' + auction_address;
+                                                                    details.appendChild(address);
+
+                                                                    // 在一行加上两个按钮，一个是start一个是end，一个是cancel
+                                                                    let buttonDiv = document.createElement('div');
+                                                                    buttonDiv.className = 'buttonDiv';
+                                                                    let startButton = document.createElement('button');
+                                                                    startButton.className = 'nft-button';
+                                                                    startButton.textContent = 'start';
+                                                                    startButton.onclick = function () {
+                                                                        console.log("点击start按钮")
+                                                                        auction_contract.methods.start().send({from: current_address})
+                                                                            .then(() => {
+                                                                                alert('start success');
+                                                                            })
+                                                                            .catch(error => {
+                                                                                console.error(error);
+                                                                            })
+                                                                    }
+                                                                    buttonDiv.appendChild(startButton);
+                                                                    let endButton = document.createElement('button');
+                                                                    endButton.className = 'nft-button';
+                                                                    endButton.textContent = 'end';
+                                                                    endButton.onclick = function () {
+                                                                        console.log("点击end按钮")
+                                                                        auction_contract.methods.end().send({from: current_address})
+                                                                            .then(() => {
+                                                                                alert('end success');
+                                                                            })
+                                                                            .catch(error => {
+                                                                                console.error(error);
+                                                                            })
+                                                                    }
+                                                                    buttonDiv.appendChild(endButton);
+                                                                    let cancelButton = document.createElement('button');
+                                                                    cancelButton.className = 'nft-button';
+                                                                    cancelButton.textContent = 'cancel';
+                                                                    cancelButton.onclick = function () {
+                                                                        console.log("点击cancel按钮")
+                                                                        auction_contract.methods.cancelAuction().send({from: current_address})
+                                                                            .then(() => {
+                                                                                alert('cancel success');
+                                                                            })
+                                                                            .catch(error => {
+                                                                                console.error(error);
+                                                                            })
+                                                                    }
+                                                                    buttonDiv.appendChild(cancelButton);
 
 
-                                                div.appendChild(details);
+                                                                    details.appendChild(buttonDiv);
 
-                                                container.appendChild(div);
+
+                                                                    div.appendChild(details);
+
+                                                                    container.appendChild(div);
+                                                                }
+                                                            })
+                                                            .catch(error => {
+                                                                console.error(error);
+                                                            })
+                                                    })
+                                                    .catch(error => {
+                                                        console.error(error);
+                                                    })
                                             })
                                             .catch(error => {
                                                 console.error(error);
@@ -839,7 +974,6 @@ async function getMyAuction() {
                             .catch(error => {
                                 console.error(error);
                             });
-
 
 
                     })
@@ -856,48 +990,48 @@ async function getMyAuction() {
 
 
 async function fetchMyNFTs() {
-    // Get all NFT
+    // 获取所有的NFT
     var nfts = []
     if (window.ethereum) {
         const web3 = new Web3(window.ethereum);
         try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-
             const contract = new web3.eth.Contract(tokenAbi, tokenAddress);
             const accounts = await web3.eth.getAccounts();
-            const current_address = accounts[0]; // use the first account
-            contract.methods.balanceOf(current_address).call()
-                .then((balance) => {
-                    const promises = [];
-                    for (let i = 0; i < balance; i++) {
-                        promises.push(contract.methods.id_list(i).call());
-                    }
-                    console.log(promises);
-                    return Promise.all(promises);
-
-                })
-                .then((ids) => {
-                    console.log('NFT IDs:', ids);
-                    let nfts = []
-                    ids.forEach((id, index) => {
+            const current_address = accounts[0]; // 使用第一个账户
+            // 拿到id列表
+            let nfts = []
+            contract.methods.getIdList(current_address).call()
+                .then(data => {
+                    console.log("id列表", data[0], data[1])
+                    ids = data[0]
+                    for (let i = 0; i < ids.length; i++) {
                         nfts.push({
                             imageUrl: "images/picture-01.jpg",
-                            id: id,
+                            id: ids[i],
                             priceInWei: 1,
-                            index: index
+                            index: i
                         })
-                    });
-
+                    }
                     let container = document.getElementById('myNFT');
-                    container.innerHTML = ''; // Clean the output
-
+                            // 清除container中除了h1标签之外的所有内容
+                            container.innerHTML = '';
+                            let h1 = document.createElement('h1');
+                            h1.textContent = 'My NFTs';
+                            container.appendChild(h1);
+                            if (nfts.length === 0) {
+                                let p = document.createElement('p');
+                                p.textContent = 'No NFTs minted yet.';
+                                // 居中显示
+                                p.style.textAlign = 'center';
+                                container.appendChild(p);
+                            }
                     nfts.forEach(nft => {
                         let div = document.createElement('div');
                         div.className = 'nft-item';
 
                         let img = document.createElement('img');
                         img.className = 'nft-image';
-                        img.src = nft.imageUrl; // Assuming image URL is in the nft object
+                        img.src = nft.imageUrl; // 假设图片URL在nft对象中
                         div.appendChild(img);
 
                         let details = document.createElement('div');
@@ -912,7 +1046,7 @@ async function fetchMyNFTs() {
                         priceDiv.textContent = 'Price: ';
                         let priceInput = document.createElement('input');
                         priceInput.type = 'text';
-                        priceInput.value = nft.priceInWei; // Assuming price is in the nft object
+                        priceInput.value = nft.priceInWei; // 假设价格在nft对象中
                         priceDiv.appendChild(priceInput);
                         details.appendChild(priceDiv);
 
@@ -926,35 +1060,65 @@ async function fetchMyNFTs() {
                         details.appendChild(dutationDiv);
 
                         let auctionButton = document.createElement('button');
-                        auctionButton.textContent = 'Auction';
+                        auctionButton.textContent = '拍卖';
+                        // 添加class
+                        auctionButton.className = "nft-button";
                         auctionButton.addEventListener('click', function () {
-                            // Auction
+                            // 拍卖
                             console.log(nft.index);
                             const auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
 
                             const auctionData = {
-                                nft: tokenAddress, // NFT address
+                                nft: tokenAddress, // NFT合约地址
                                 nftId: nft.id,           // NFT ID
-                                startingBid: web3.utils.toWei($('.nft-item').eq(nft.index).find('.nft-price input').val(), 'ether'), // 起始出价
+                                startingBid: web3.utils.toWei($('.nft-item').eq(nft.index).find('.nft-price input').val(), 'wei'), // 起始出价
                                 auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  // 拍卖持续时间（例如，24小时）
-                                authorizedAddress: current_address, // authorized Address
-                                owner: current_address   // seller
+                                authorizedAddress: current_address, // 授权地址
+                                owner: current_address   // 拥有者
                             }
-                            auctionFactoryContract.methods.createAuction(auctionData).send({ from: current_address })
+                            console.log("拍卖合约创建参数", auctionData)
+                            auctionFactoryContract.methods.createAuction(auctionData).send({from: current_address})
                                 .on('transactionHash', (hash) => {
-                                    console.log('transactionHash:', hash);
+                                    console.log('交易哈希:', hash);
                                 })
+                                // .on('data', event => {
+                                //     // 获取创建的auction地址
+                                //     new_auction_address = event.returnValues[0]
+                                //     token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                                //     token_Contract.methods.approve(new_auction_address, nft.id).send({from: current_address})
+                                //         .on('transactionHash', function (hash) {
+                                //             console.log("Transaction hash: " + hash);
+                                //         })
+                                //         .on('confirmation', function (confirmationNumber, receipt) {
+                                //             console.log("Confirmation number: " + confirmationNumber);
+                                //         })
+                                //         .on('receipt', function (receipt) {
+                                //             console.log("approve success");
+                                //             // approve成功
+                                //             // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
+                                //             // auction_Contract.methods.start().send({from: current_address})
+                                //             //     .then(receipt => {
+                                //             //         console.log("Auction started!", receipt);
+                                //             //     })
+                                //             //     .catch(error => {
+                                //             //         console.error(error);
+                                //             //     });
+                                //         })
+                                //         .on('error', console.error);
+                                // })
                                 .on('receipt', (receipt) => {
-                                    console.log('Receipt:', receipt);
-                                    alert('Auction created successfully!');
-                                    // Get the address of auction
+                                    console.log('交易收据:', receipt);
+                                    alert('拍卖已创建!');
+                                    // 获取创建的auction地址
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
-                                        .then((datas) => {
-                                            create_auction = datas[-1]
-                                            // Get the address of auction
+                                        .then(datas => {
+                                            console.log("获取创建的地址", datas)
+                                            console.log("create_auction", datas[datas.length - 1])
+                                            create_auction = datas[datas.length - 1]
+                                            // 拿到创建的auction地址
                                             token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                                            token_Contract.methods.approve(current_address, nft.id).send({ from: current_address })
+                                            token_Contract.methods.approve(create_auction, nft.id).send({from: current_address})
                                                 .on('transactionHash', function (hash) {
                                                     console.log("Transaction hash: " + hash);
                                                 })
@@ -964,23 +1128,23 @@ async function fetchMyNFTs() {
                                                 .on('receipt', function (receipt) {
                                                     console.log("approve success");
                                                     // approve
-                                                    auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
-                                                    auction_Contract.methods.start().send({ from: current_address })
-                                                        .then(receipt => {
-                                                            console.log("Auction started!", receipt);
-                                                        })
-                                                        .catch(error => {
-                                                            console.error(error);
-                                                        });
+                                                    // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
+                                                    // auction_Contract.methods.start().send({from: current_address})
+                                                    //     .then(receipt => {
+                                                    //         console.log("Auction started!", receipt);
+                                                    //     })
+                                                    //     .catch(error => {
+                                                    //         console.error(error);
+                                                    //     });
                                                 })
-                                                .on('error', console.error); // for error
+                                                .on('error', console.error); // 如果在交易过程中出现错误，将在此处捕获
                                         })
                                     // token_contract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
                                 })
                                 .on('error', (error) => {
-                                    console.error('Error:', error);
-                                    alert('Failed to create auction, try again later');
+                                    console.error('出错了:', error);
+                                    alert('创建拍卖失败，请稍后重试或联系支持人员。');
                                 });
                         });
                         details.appendChild(auctionButton);
@@ -990,9 +1154,175 @@ async function fetchMyNFTs() {
                         container.appendChild(div);
                     });
                 })
-                .catch((error) => {
-                    console.error(error);
-                });
+
+            // contract.methods.balanceOf(current_address).call()
+            //     .then((balance) => {
+            //         const promises = [];
+            //         for (let i = 0; i < balance; i++) {
+            //             promises.push(contract.methods.id_list(current_address, i).call());
+            //         }
+            //         console.log(promises);
+            //         return Promise.all(promises);
+            //
+            //     })
+            //     .then((ids) => {
+            //         console.log('NFT IDs:', ids);
+            //         let nfts = []
+            //         ids.forEach((id, index) => {
+            //             nfts.push({
+            //                 imageUrl: "images/picture-01.jpg",
+            //                 id: id,
+            //                 priceInWei: 1,
+            //                 index: index
+            //             })
+            //         });
+            //
+            //         let container = document.getElementById('myNFT');
+            //         // 清除container中除了h1标签之外的所有内容
+            //         container.innerHTML = '';
+            //         let h1 = document.createElement('h1');
+            //         h1.textContent = 'My NFTs';
+            //         container.appendChild(h1);
+            //         if (nfts.length === 0) {
+            //             let p = document.createElement('p');
+            //             p.textContent = 'No NFTs minted yet.';
+            //             // 居中显示
+            //             p.style.textAlign = 'center';
+            //             container.appendChild(p);
+            //         }
+            //
+            //         nfts.forEach(nft => {
+            //             let div = document.createElement('div');
+            //             div.className = 'nft-item';
+            //
+            //             let img = document.createElement('img');
+            //             img.className = 'nft-image';
+            //             img.src = nft.imageUrl; // 假设图片URL在nft对象中
+            //             div.appendChild(img);
+            //
+            //             let details = document.createElement('div');
+            //             details.className = 'nft-details';
+            //
+            //             let idDiv = document.createElement('div');
+            //             idDiv.textContent = 'NFT ID: ' + nft.id;
+            //             details.appendChild(idDiv);
+            //
+            //             let priceDiv = document.createElement('div');
+            //             priceDiv.className = 'nft-price';
+            //             priceDiv.textContent = 'Price: ';
+            //             let priceInput = document.createElement('input');
+            //             priceInput.type = 'text';
+            //             priceInput.value = nft.priceInWei; // 假设价格在nft对象中
+            //             priceDiv.appendChild(priceInput);
+            //             details.appendChild(priceDiv);
+            //
+            //             let dutationDiv = document.createElement('div');
+            //             dutationDiv.className = 'nft-duration';
+            //             dutationDiv.textContent = 'duration: ';
+            //             let dutationInput = document.createElement("input")
+            //             dutationInput.type = 'text';
+            //             dutationInput.value = 20
+            //             dutationDiv.append(dutationInput)
+            //             details.appendChild(dutationDiv);
+            //
+            //             let auctionButton = document.createElement('button');
+            //             auctionButton.textContent = '拍卖';
+            //             // 添加class
+            //             auctionButton.className = "nft-button";
+            //             auctionButton.addEventListener('click', function () {
+            //                 // 拍卖
+            //                 console.log(nft.index);
+            //                 const auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
+            //
+            //                 const auctionData = {
+            //                     nft: tokenAddress, // NFT合约地址
+            //                     nftId: nft.id,           // NFT ID
+            //                     startingBid: web3.utils.toWei($('.nft-item').eq(nft.index).find('.nft-price input').val(), 'wei'), // 起始出价
+            //                     auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  // 拍卖持续时间（例如，24小时）
+            //                     authorizedAddress: current_address, // 授权地址
+            //                     owner: current_address   // 拥有者
+            //                 }
+            //                 console.log("拍卖合约创建参数", auctionData)
+            //                 auctionFactoryContract.methods.createAuction(auctionData).send({from: current_address})
+            //                     .on('transactionHash', (hash) => {
+            //                         console.log('交易哈希:', hash);
+            //                     })
+            //                     // .on('data', event => {
+            //                     //     // 获取创建的auction地址
+            //                     //     new_auction_address = event.returnValues[0]
+            //                     //     token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+            //                     //     token_Contract.methods.approve(new_auction_address, nft.id).send({from: current_address})
+            //                     //         .on('transactionHash', function (hash) {
+            //                     //             console.log("Transaction hash: " + hash);
+            //                     //         })
+            //                     //         .on('confirmation', function (confirmationNumber, receipt) {
+            //                     //             console.log("Confirmation number: " + confirmationNumber);
+            //                     //         })
+            //                     //         .on('receipt', function (receipt) {
+            //                     //             console.log("approve success");
+            //                     //             // approve成功
+            //                     //             // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
+            //                     //             // auction_Contract.methods.start().send({from: current_address})
+            //                     //             //     .then(receipt => {
+            //                     //             //         console.log("Auction started!", receipt);
+            //                     //             //     })
+            //                     //             //     .catch(error => {
+            //                     //             //         console.error(error);
+            //                     //             //     });
+            //                     //         })
+            //                     //         .on('error', console.error);
+            //                     // })
+            //                     .on('receipt', (receipt) => {
+            //                         console.log('交易收据:', receipt);
+            //                         alert('拍卖已创建!');
+            //                         // 获取创建的auction地址
+            //                         factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
+            //                         factory_Contract.methods.getAllAuctions().call()
+            //                             .then(datas => {
+            //                                 console.log("获取创建的地址", datas)
+            //                                 console.log("create_auction", datas[datas.length - 1])
+            //                                 create_auction = datas[datas.length - 1]
+            //                                 // 拿到创建的auction地址
+            //                                 token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+            //                                 token_Contract.methods.approve(create_auction, nft.id).send({from: current_address})
+            //                                     .on('transactionHash', function (hash) {
+            //                                         console.log("Transaction hash: " + hash);
+            //                                     })
+            //                                     .on('confirmation', function (confirmationNumber, receipt) {
+            //                                         console.log("Confirmation number: " + confirmationNumber);
+            //                                     })
+            //                                     .on('receipt', function (receipt) {
+            //                                         console.log("approve success");
+            //                                         // approve
+            //                                         // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
+            //                                         // auction_Contract.methods.start().send({from: current_address})
+            //                                         //     .then(receipt => {
+            //                                         //         console.log("Auction started!", receipt);
+            //                                         //     })
+            //                                         //     .catch(error => {
+            //                                         //         console.error(error);
+            //                                         //     });
+            //                                     })
+            //                                     .on('error', console.error); // 如果在交易过程中出现错误，将在此处捕获
+            //                             })
+            //                         // token_contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+            //
+            //                     })
+            //                     .on('error', (error) => {
+            //                         console.error('出错了:', error);
+            //                         alert('创建拍卖失败，请稍后重试或联系支持人员。');
+            //                     });
+            //             });
+            //             details.appendChild(auctionButton);
+            //
+            //             div.appendChild(details);
+            //
+            //             container.appendChild(div);
+            //         });
+            //     })
+            //     .catch((error) => {
+            //         console.error(error);
+            //     });
         } catch (error) {
             console.error(error);
         }
@@ -1001,26 +1331,250 @@ async function fetchMyNFTs() {
     }
 }
 
-(() => {
-    $('#content > div').hide(); 
-    $('#mintNFT').show(); 
+async function getNFTMarket() {
+    if (window.ethereum) {
+        const web3 = new Web3(window.ethereum);
+        try {
+            // 请求用户授权
+            await window.ethereum.request({method: 'eth_requestAccounts'});
 
+            const contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
+            const accounts = await web3.eth.getAccounts();
+            const current_address = accounts[0]; // 使用第一个账户
+            contract.methods.getAllAuctions().call()
+                .then((datas) => {
+                    let container = document.getElementById('nftMarket');
+                    container.innerHTML = '';
+                    // 添加h1标签
+                    let h1 = document.createElement('h1');
+                    h1.innerHTML = 'Marketplace';
+                    container.appendChild(h1);
+                    // 判断是否有拍卖
+                    if (datas.length === 0) {
+                        let p = document.createElement('p');
+                        p.innerHTML = 'No NFT';
+                        // 居中显示
+                        p.style.textAlign = 'center';
+                        container.appendChild(p);
+                    }
+
+                    datas.forEach((auction_address, index) => {
+                        const auction_contract = new web3.eth.Contract(auctionAbi, auction_address);
+                        // 获取NFT ID
+                        auction_contract.methods.nftId().call()
+                            .then(nftId => {
+                                // 获取最高出价者
+                                auction_contract.methods.highestBidder().call()
+                                    .then(highestBidder => {
+                                        auction_contract.methods.highestBid().call()
+                                            .then(h_price => {
+                                                // 获取拍卖结束时间
+                                                auction_contract.methods.endAt().call()
+                                                    .then(endAt => {
+                                                        // 获取owner
+                                                        console.log("截止时间", endAt)
+                                                        auction_contract.methods.owner().call()
+                                                            .then(owner => {
+                                                                // endAt不等于0并且大于当前时间
+                                                                if (endAt !== '0' && endAt > Date.now() / 1000) {
+                                                                    // 填充页面
+
+                                                                    let div = document.createElement('div');
+                                                                    div.className = 'nft-item';
+
+                                                                    let img = document.createElement('img');
+                                                                    img.className = 'nft-image';
+                                                                    img.src = "images/picture-01.jpg"
+                                                                    div.appendChild(img);
+
+                                                                    let details = document.createElement('div');
+                                                                    details.className = 'nft-details';
+
+                                                                    let idDiv = document.createElement('div');
+                                                                    idDiv.textContent = 'NFT ID: ' + nftId;
+                                                                    details.appendChild(idDiv);
+
+                                                                    let h_id = document.createElement('div');
+                                                                    h_id.textContent = 'highest Bidder: ' + highestBidder;
+                                                                    details.appendChild(h_id);
+
+                                                                    let price = document.createElement('div');
+                                                                    price.textContent = 'highest price: ' + h_price;
+                                                                    // price后面添加一个粗的单位
+                                                                    let span = document.createElement('span');
+                                                                    span.textContent = 'wei';
+                                                                    span.style.fontWeight = 'bold';
+                                                                    price.appendChild(span);
+                                                                    details.appendChild(price);
+
+                                                                    let end = document.createElement('div');
+                                                                    end.textContent = 'end at: ' + new Date(endAt * 1000).toLocaleString();
+                                                                    details.appendChild(end);
+
+                                                                    let ownerDiv = document.createElement('div');
+                                                                    ownerDiv.textContent = 'owner: ' + owner;
+                                                                    details.appendChild(ownerDiv);
+                                                                    // bid前面放置一个Input输入框
+                                                                    let input = document.createElement('input');
+                                                                    input.type = 'text';
+                                                                    input.placeholder = 'Enter your bid (wei)';
+                                                                    input.className = 'nft-input';
+                                                                    details.appendChild(input);
+                                                                    // bid按钮
+                                                                    let button = document.createElement('button');
+                                                                    button.textContent = 'Bid';
+                                                                    button.className = 'nft-button';
+                                                                    button.onclick = function () {
+                                                                        auction_contract.methods.bid().send({"from": current_address, "value": web3.utils.toWei(input.value, 'wei')})
+                                                                    }
+                                                                    details.appendChild(button);
+
+                                                                    div.appendChild(details);
+
+                                                                    container.appendChild(div);
+                                                                }
+                                                                // if (owner === current_address) {
+                                                                //     // 填充页面
+                                                                //
+                                                                //     let div = document.createElement('div');
+                                                                //     div.className = 'nft-item';
+                                                                //
+                                                                //     let img = document.createElement('img');
+                                                                //     img.className = 'nft-image';
+                                                                //     img.src = "images/picture-01.jpg"
+                                                                //     div.appendChild(img);
+                                                                //
+                                                                //     let details = document.createElement('div');
+                                                                //     details.className = 'nft-details';
+                                                                //
+                                                                //     let idDiv = document.createElement('div');
+                                                                //     idDiv.textContent = 'NFT ID: ' + nftId;
+                                                                //     details.appendChild(idDiv);
+                                                                //
+                                                                //     let h_id = document.createElement('div');
+                                                                //     h_id.textContent = 'highest Bidder: ' + highestBidder;
+                                                                //     details.appendChild(h_id);
+                                                                //
+                                                                //     let price = document.createElement('div');
+                                                                //     price.textContent = 'highest price: ' + h_price;
+                                                                //     // price后面添加一个粗的单位
+                                                                //     let span = document.createElement('span');
+                                                                //     span.textContent = ' wei';
+                                                                //     span.style.fontWeight = 'bold';
+                                                                //     price.appendChild(span);
+                                                                //     details.appendChild(price);
+                                                                //
+                                                                //     let end_time = document.createElement("div");
+                                                                //     // endAt 1691344532转字符串
+                                                                //     if (endAt === "0") {
+                                                                //         endAt = "Not start";
+                                                                //     }
+                                                                //     endAt = new Date(parseInt(endAt) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
+                                                                //
+                                                                //     end_time.textContent = "end time: " + endAt;
+                                                                //     details.appendChild(end_time);
+                                                                //
+                                                                //     let address = document.createElement('div');
+                                                                //     address.textContent = 'auctionContractAddress: ' + auction_address;
+                                                                //     details.appendChild(address);
+                                                                //
+                                                                //     // 在一行加上两个按钮，一个是start一个是end
+                                                                //     let buttonDiv = document.createElement('div');
+                                                                //     buttonDiv.className = 'buttonDiv';
+                                                                //     let startButton = document.createElement('button');
+                                                                //     startButton.className = 'startButton';
+                                                                //     startButton.textContent = 'start';
+                                                                //     startButton.onclick = function () {
+                                                                //         console.log("点击start按钮")
+                                                                //         auction_contract.methods.start().send({from: current_address})
+                                                                //             .then(() => {
+                                                                //                 alert('start success');
+                                                                //             })
+                                                                //             .catch(error => {
+                                                                //                 console.error(error);
+                                                                //             })
+                                                                //     }
+                                                                //     buttonDiv.appendChild(startButton);
+                                                                //     let endButton = document.createElement('button');
+                                                                //     endButton.className = 'endButton';
+                                                                //     endButton.textContent = 'end';
+                                                                //     endButton.onclick = function () {
+                                                                //         console.log("点击end按钮")
+                                                                //         auction_contract.methods.end().send({from: current_address})
+                                                                //             .then(() => {
+                                                                //                 alert('end success');
+                                                                //             })
+                                                                //             .catch(error => {
+                                                                //                 console.error(error);
+                                                                //             })
+                                                                //     }
+                                                                //     buttonDiv.appendChild(endButton);
+                                                                //     details.appendChild(buttonDiv);
+                                                                //
+                                                                //
+                                                                //     div.appendChild(details);
+                                                                //
+                                                                //     container.appendChild(div);
+                                                                // }
+                                                            })
+                                                            .catch(error => {
+                                                                console.error(error);
+                                                            })
+                                                    })
+                                                    .catch(error => {
+                                                        console.error(error);
+                                                    })
+                                            })
+                                            .catch(error => {
+                                                console.error(error);
+                                            });
+
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                    });
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+
+
+                    })
+                })
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    } else {
+        console.log();
+    }
+}
+
+(() => {
+    $('#content > div').hide(); // 初始隐藏所有内容div
+    $('#mintNFT').show(); // 可以选择显示一个默认div
     $('.nav-link').click(function () {
+        // 添加一个class nav-cur
+        $('.nav-link').removeClass('nav-cur');
+        $(this).addClass('nav-cur');
         var target = $(this).data('target');
-        $('#content > div').hide(); 
-        $('#' + target).show(); 
+        $('#content > div').hide(); // 隐藏所有内容div
+        $('#' + target).show(); // 显示被点击导航对应的div
         if (target == "myNFT") {
             fetchMyNFTs()
         }
         if (target == "myAuction") {
             getMyAuction()
-
+        }
+        if (target == "nftMarket") {
+            getNFTMarket()
         }
     });
 
     $('#connectWallet').click(async function () {
         if (typeof window.ethereum !== 'undefined') {
-            window.ethereum.request({ method: 'eth_requestAccounts' })
+            window.ethereum.request({method: 'eth_requestAccounts'})
                 .then(handleAccountsChanged)
                 .catch(function (err) {
                     alert('An error occurred while connecting to the wallet: ' + err.message);
@@ -1030,16 +1584,17 @@ async function fetchMyNFTs() {
         }
     });
 
-    // Handle account changes
+    // 处理账号变化
     function handleAccountsChanged(accounts) {
         if (accounts.length === 0) {
             alert('No account connected');
         } else {
             $('#connectWallet').hide();
-            $('#walletAddress').text(accounts[0]); 
+            $('#walletAddress').text(accounts[0]); // 可以考虑缩短地址
         }
     }
 
+    // 监听账号变化
     if (window.ethereum) {
         window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
@@ -1047,25 +1602,26 @@ async function fetchMyNFTs() {
     $('#mintButton').click(async function () {
         var nftId = $('#nftId').val();
         if (nftId == "") {
-            alert("Please enter NFT id")
+            alert("请输入id")
             return
         }
 
         if (window.ethereum) {
             const web3 = new Web3(window.ethereum);
             try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                // 请求用户授权
+                await window.ethereum.request({method: 'eth_requestAccounts'});
 
                 const contract = new web3.eth.Contract(tokenAbi, tokenAddress);
                 const accounts = await web3.eth.getAccounts();
-                const current_address = accounts[0]; 
+                const current_address = accounts[0]; // 使用第一个账户
 
                 if (nftId) {
                     console.log('Minting NFT with ID:', nftId);
-                    contract.methods.mint(current_address, nftId).send({ from: current_address })
+                    contract.methods.mint(current_address, nftId).send({from: current_address})
                         .on('transactionHash', (hash) => {
-                            console.log('transactionHash:', hash);
-                            alert("Created Successfully!")
+                            console.log('交易哈希:', hash);
+                            alert("创建成功")
                         })
                 } else {
                     alert('Please enter an NFT ID');

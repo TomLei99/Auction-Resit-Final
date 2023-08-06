@@ -64,7 +64,12 @@ abstract contract ERC721 is IERC721 {
     // Mapping from token ID to approved address
     mapping(uint => address) internal _approvals;
 
-    uint[] public  id_list;
+    // uint[] public  id_list;
+    struct id_info {
+        uint[] id_li;
+        uint length;
+    }
+    mapping(address => id_info) public id_list; 
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) public isApprovedForAll;
@@ -116,6 +121,28 @@ abstract contract ERC721 is IERC721 {
             isApprovedForAll[owner][spender] ||
             spender == _approvals[id]);
     }
+    function removeIdFromList(address owner, uint idToRemove) public {
+    uint[] storage ids = id_list[owner].id_li;
+    uint length = id_list[owner].length;
+
+    // 寻找要删除的ID的位置
+    uint indexToRemove = length; // 初始化为无效的索引
+    for (uint i = 0; i < length; i++) {
+        if (ids[i] == idToRemove) {
+            indexToRemove = i;
+            break;
+        }
+    }
+
+    // 如果找到该ID，则将其后面的元素向前移动一个位置
+    if (indexToRemove < length) {
+        for (uint i = indexToRemove; i < length - 1; i++) {
+            ids[i] = ids[i + 1];
+        }
+        ids.pop(); // 移除最后一个元素
+        id_list[owner].length--; // 更新长度
+    }
+}
 
     function transferFrom(address from, address to, uint id) public {
         require(from == _ownerOf[id], "from != owner");
@@ -126,7 +153,9 @@ abstract contract ERC721 is IERC721 {
         _balanceOf[from]--;
         _balanceOf[to]++;
         _ownerOf[id] = to;
-
+        removeIdFromList(from, id);
+        id_list[to].id_li.push(id);
+        id_list[to].length += 1;
         delete _approvals[id];
 
         emit Transfer(from, to, id);
@@ -165,16 +194,21 @@ abstract contract ERC721 is IERC721 {
 
         _balanceOf[to]++;
         _ownerOf[id] = to;
-        id_list.push(id);
+        // id_list.push(id);
+        id_list[to].id_li.push(id);
+        id_list[to].length += 1;
         emit Transfer(address(0), to, id);
     }
+
+    function getIdList(address owner) external view returns (uint[] memory, uint) {
+    return (id_list[owner].id_li, id_list[owner].length);
+}
 
     function _burn(uint id) internal {
         address owner = _ownerOf[id];
         require(owner != address(0), "not minted");
 
         _balanceOf[owner] -= 1;
-
         delete _ownerOf[id];
         delete _approvals[id];
 

@@ -108,6 +108,9 @@ contract EnglishAuction {
         // Transfer the NFT back to the seller
         nft.transferFrom(address(this), owner, nftId);
         canceled = true;
+        ended = true;
+        started = false;
+        endAt = 0;
         emit AuctionCanceled();
     }
 
@@ -133,6 +136,7 @@ contract EnglishAuction {
         } else {
             nft.transferFrom(address(this), owner, nftId);
         }
+        
 
         emit End(highestBidder, highestBid);
 
