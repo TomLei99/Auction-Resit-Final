@@ -966,7 +966,7 @@ async function getMyAuction() {
                                                                                                 }
                                                                                                 auction_contract.methods.end().send({from: current_address})
                                                                                                     .then(() => {
-                                                                                                        alert('end success');
+                                                                                                        alert('Auction end success, transaction finish!');
                                                                                                     })
                                                                                                     .catch(error => {
                                                                                                         console.error(error);
@@ -1115,7 +1115,7 @@ async function fetchMyNFTs() {
 
                         let dutationDiv = document.createElement('div');
                         dutationDiv.className = 'nft-duration';
-                        dutationDiv.textContent = 'duration: ';
+                        dutationDiv.textContent = 'duration(s): ';
                         let dutationInput = document.createElement("input")
                         dutationInput.type = 'text';
                         dutationInput.value = 20
@@ -1326,12 +1326,15 @@ async function getNFTMarket() {
                                                                     button.textContent = 'Bid';
                                                                     button.className = 'nft-button';
                                                                     button.onclick = function () {
-                                                                        auction_contract.methods.bid().send({
-                                                                            "from": current_address,
-                                                                            "value": web3.utils.toWei(input.value, 'wei')
+                                                                        try {
+                                                                            const transaction = await auction_contract.methods.bid().send({ "from": current_address, "value": web3.utils.toWei(input.value, 'wei') });
+                                                                            if (transaction.status) {
+                                                                                alert('Bid success, please refresh the page.');
+                                                                            }
+                                                                        } catch (error) {
+                                                                            console.error(error);
                                                                         }
-                                                                        )
-                                                                        alert('Bid success, please refresh the page!');
+                                                                    }
                                                                     }
                                                                     details.appendChild(button);
 
