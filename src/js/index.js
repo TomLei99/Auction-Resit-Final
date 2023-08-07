@@ -825,6 +825,10 @@ async function getMyAuction() {
             let h1 = document.createElement('h1');
             h1.innerHTML = 'My Auction';
             container.appendChild(h1);
+            let subtitle = document.createElement('h2');
+            subtitle.textContent = 'Track and manage your ongoing auctions!'; // Change this to your desired subtitle
+            container.appendChild(subtitle);
+
             let loaderWrapper = document.createElement('div');
             loaderWrapper.className = 'loader-wrapper';
             let loader = document.createElement('div');
@@ -1056,6 +1060,10 @@ async function fetchMyNFTs() {
             let h1 = document.createElement('h1');
             h1.textContent = 'My NFTs';
             container.appendChild(h1);
+            // Add a subtitle
+            let subtitle = document.createElement('h2');
+            subtitle.textContent = 'Manage your NFTs and create auction here!'; // Change this to your desired subtitle
+            container.appendChild(subtitle);
 
             let loaderWrapper = document.createElement('div');
             loaderWrapper.className = 'loader-wrapper';
