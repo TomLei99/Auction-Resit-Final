@@ -1048,7 +1048,7 @@ async function fetchMyNFTs() {
 
                         let dutationDiv = document.createElement('div');
                         dutationDiv.className = 'nft-duration';
-                        dutationDiv.textContent = 'duration(>=500): ';
+                        dutationDiv.textContent = 'duration(s): ';
                         let dutationInput = document.createElement("input")
                         dutationInput.type = 'text';
                         dutationInput.value = 20
@@ -1105,14 +1105,13 @@ async function fetchMyNFTs() {
                                 .on('receipt', (receipt) => {
                                     console.log('Receipt::', receipt);
                                     alert('Auction create success!');
-                                    // 获取创建的auction地址
+                                  
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
                                         .then(datas => {
-                                            console.log("获取创建的地址", datas)
+                                            console.log("Get address", datas)
                                             console.log("create_auction", datas[datas.length - 1])
                                             create_auction = datas[datas.length - 1]
-                                            // 拿到创建的auction地址
                                             token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
                                             token_Contract.methods.approve(create_auction, nft.id).send({from: current_address})
                                                 .on('transactionHash', function (hash) {
