@@ -903,10 +903,10 @@ async function getMyAuction() {
                                                                     startButton.className = 'nft-button';
                                                                     startButton.textContent = 'start';
                                                                     startButton.onclick = function () {
-                                                                        console.log("点击start按钮")
+                                                                        console.log("click start")
                                                                         auction_contract.methods.start().send({from: current_address})
                                                                             .then(() => {
-                                                                                alert('start success');
+                                                                                alert('start success, check it in NFT market');
                                                                             })
                                                                             .catch(error => {
                                                                                 console.error(error);
@@ -917,10 +917,10 @@ async function getMyAuction() {
                                                                     endButton.className = 'nft-button';
                                                                     endButton.textContent = 'end';
                                                                     endButton.onclick = function () {
-                                                                        console.log("点击end按钮")
+                                                                        console.log("click end")
                                                                         auction_contract.methods.end().send({from: current_address})
                                                                             .then(() => {
-                                                                                alert('end success');
+                                                                                alert('end success, transaction success!');
                                                                             })
                                                                             .catch(error => {
                                                                                 console.error(error);
@@ -931,7 +931,7 @@ async function getMyAuction() {
                                                                     cancelButton.className = 'nft-button';
                                                                     cancelButton.textContent = 'cancel';
                                                                     cancelButton.onclick = function () {
-                                                                        console.log("点击cancel按钮")
+                                                                        console.log("click cancel")
                                                                         auction_contract.methods.cancelAuction().send({from: current_address})
                                                                             .then(() => {
                                                                                 alert('cancel success');
@@ -1080,7 +1080,7 @@ async function fetchMyNFTs() {
                             
                                 .on('receipt', (receipt) => {
                                     console.log('Receipt::', receipt);
-                                    alert('Auction create success!');
+                                    alert('Auction create success, please approve it in your wallet!');
                                   
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
@@ -1590,7 +1590,7 @@ async function getNFTMarket() {
                     contract.methods.mint(current_address, nftId).send({from: current_address})
                         .on('transactionHash', (hash) => {
                             console.log('Transaction Hash:', hash);
-                            alert("Create Successfully!")
+                            alert("Create Successfully, please refresh the page!")
                         })
                 } else {
                     alert('Please enter an NFT ID');
