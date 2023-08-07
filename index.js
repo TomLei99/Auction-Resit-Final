@@ -1068,14 +1068,14 @@ async function fetchMyNFTs() {
                                 nft: tokenAddress, // NFT address
                                 nftId: nft.id,           // NFT ID
                                 startingBid: web3.utils.toWei($('.nft-item').eq(nft.index).find('.nft-price input').val(), 'wei'), // 起始出价
-                                auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  // 拍卖持续时间（例如，24小时）
+                                auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  
                                 authorizedAddress: current_address, 
                                 owner: current_address   // owner
                             }
-                            console.log("拍卖合约创建参数", auctionData)
+                            console.log("Auction Data", auctionData)
                             auctionFactoryContract.methods.createAuction(auctionData).send({from: current_address})
                                 .on('transactionHash', (hash) => {
-                                    console.log('交易哈希:', hash);
+                                    console.log('Transaction Hash:', hash);
                                 })
                                 // .on('data', event => {
                                 //     // 获取创建的auction地址
