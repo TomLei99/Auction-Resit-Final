@@ -927,10 +927,10 @@ async function getMyAuction() {
                                                                                                 status.textContent = 'Status: Canceled';
                                                                                             } else if (ended) {
                                                                                                 status.textContent = 'Status: Ended';
-                                                                                            } else if (Date.now() / 1000 > endAt) {
-                                                                                                status.textContent = 'Status: Wait for seller to end';
                                                                                             } else if (started && Date.now() / 1000 <= endAt) {
-                                                                                                status.textContent = 'Status: Started';
+                                                                                                status.textContent = 'Status: In process';
+                                                                                            } else {
+                                                                                                status.textContent = 'Status: Not Start';
                                                                                             }
                                                                                             
                                                                                             details.appendChild(status);
