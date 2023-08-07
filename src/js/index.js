@@ -1042,7 +1042,7 @@ async function fetchMyNFTs() {
                         priceDiv.textContent = 'Price: ';
                         let priceInput = document.createElement('input');
                         priceInput.type = 'text';
-                        priceInput.value = nft.priceInWei; // 假设价格在nft对象中
+                        priceInput.value = nft.priceInWei; 
                         priceDiv.appendChild(priceInput);
                         details.appendChild(priceDiv);
 
@@ -1051,7 +1051,7 @@ async function fetchMyNFTs() {
                         dutationDiv.textContent = 'duration(s): ';
                         let dutationInput = document.createElement("input")
                         dutationInput.type = 'text';
-                        dutationInput.value = 20
+                        dutationInput.value = 300
                         dutationDiv.append(dutationInput)
                         details.appendChild(dutationDiv);
 
@@ -1077,31 +1077,7 @@ async function fetchMyNFTs() {
                                 .on('transactionHash', (hash) => {
                                     console.log('Transaction Hash:', hash);
                                 })
-                                // .on('data', event => {
-                                //     // 获取创建的auction地址
-                                //     new_auction_address = event.returnValues[0]
-                                //     token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
-                                //     token_Contract.methods.approve(new_auction_address, nft.id).send({from: current_address})
-                                //         .on('transactionHash', function (hash) {
-                                //             console.log("Transaction hash: " + hash);
-                                //         })
-                                //         .on('confirmation', function (confirmationNumber, receipt) {
-                                //             console.log("Confirmation number: " + confirmationNumber);
-                                //         })
-                                //         .on('receipt', function (receipt) {
-                                //             console.log("approve success");
-                                //             // approve成功
-                                //             // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
-                                //             // auction_Contract.methods.start().send({from: current_address})
-                                //             //     .then(receipt => {
-                                //             //         console.log("Auction started!", receipt);
-                                //             //     })
-                                //             //     .catch(error => {
-                                //             //         console.error(error);
-                                //             //     });
-                                //         })
-                                //         .on('error', console.error);
-                                // })
+                            
                                 .on('receipt', (receipt) => {
                                     console.log('Receipt::', receipt);
                                     alert('Auction create success!');
