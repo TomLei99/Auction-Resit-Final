@@ -1590,7 +1590,7 @@ async function getNFTMarket() {
                     contract.methods.mint(current_address, nftId).send({from: current_address})
                         .on('transactionHash', (hash) => {
                             console.log('Transaction Hash:', hash);
-                            alert("Create Successfully, please refresh the page!")
+                            alert("Create Successfully, please check it in NFT Place!")
                         })
                 } else {
                     alert('Please enter an NFT ID');
