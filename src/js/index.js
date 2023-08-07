@@ -929,7 +929,7 @@ async function getMyAuction() {
                                                                                                 status.textContent = 'Status: Ended';
                                                                                             } else if (Date.now() / 1000 > endAt) {
                                                                                                 status.textContent = 'Status: Wait for seller to end';
-                                                                                            } else if (started) {
+                                                                                            } else if (started && Date.now() / 1000 <= endAt) {
                                                                                                 status.textContent = 'Status: Started';
                                                                                             }
                                                                                             
