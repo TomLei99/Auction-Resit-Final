@@ -920,7 +920,7 @@ async function getMyAuction() {
                                                                         console.log("click end")
                                                                         auction_contract.methods.end().send({from: current_address})
                                                                             .then(() => {
-                                                                                alert('end success, transaction success!');
+                                                                                alert('Auction End success, transaction success!');
                                                                             })
                                                                             .catch(error => {
                                                                                 console.error(error);
