@@ -895,6 +895,20 @@ async function getMyAuction() {
                                                                     let address = document.createElement('div');
                                                                     address.textContent = 'auctionContractAddress: ' + auction_address;
                                                                     details.appendChild(address);
+                                                                    let status = document.createElement('div');
+                                                                    status.textContent = 'status: ';
+                                                                    if (canceled) {
+                                                                        status.textContent += 'canceled ';
+                                                                    }
+                                                                    if (ended) {
+                                                                        status.textContent += 'ended ';
+                                                                    }
+                                                                    if (started) {
+                                                                        status.textContent += 'started ';
+                                                                    }
+                                                                    details.appendChild(status);
+                                                                                           
+
                                                                     let buttonDiv = document.createElement('div');
                                                                     buttonDiv.className = 'buttonDiv';
                                                                     let startButton = document.createElement('button');
