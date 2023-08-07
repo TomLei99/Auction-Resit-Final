@@ -1,5 +1,3 @@
-
-
 tokenAbi = [
     {
         "anonymous": false,
@@ -820,23 +818,38 @@ async function getMyAuction() {
 
             const contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
             const accounts = await web3.eth.getAccounts();
-            const current_address = accounts[0]; 
+            const current_address = accounts[0]; // 使用第一个账户
+            let container = document.getElementById('myAuction');
+            container.innerHTML = '';
+           
+            let h1 = document.createElement('h1');
+            h1.innerHTML = 'My Auction';
+            container.appendChild(h1);
+            let loaderWrapper = document.createElement('div');
+            loaderWrapper.className = 'loader-wrapper';
+            let loader = document.createElement('div');
+            loader.className = 'loader';
+            for (let i = 0; i < 4; i++) {
+                let dot = document.createElement('div');
+                dot.className = 'dot';
+                loader.appendChild(dot);
+            }
+            loaderWrapper.appendChild(loader);
+            container.appendChild(loaderWrapper);
+
             contract.methods.getAllAuctions().call()
                 .then((datas) => {
-                    let nfts = []
-                    let container = document.getElementById('myAuction');
-                    container.innerHTML = '';
-                    let h1 = document.createElement('h1');
-                    h1.innerHTML = 'My Auction';
-                    container.appendChild(h1);
-                    // Determine whether there is an auction
+
+                    
                     if (datas.length === 0) {
                         let p = document.createElement('p');
                         p.innerHTML = 'No Auction';
+                       
                         p.style.textAlign = 'center';
                         container.appendChild(p);
+                        container.removeChild(loaderWrapper);
                     }
-
+                    let auction_num = 0
                     datas.forEach((auction_address, index) => {
                         const auction_contract = new web3.eth.Contract(auctionAbi, auction_address);
                         // Get NFT ID
@@ -847,127 +860,154 @@ async function getMyAuction() {
                                     .then(highestBidder => {
                                         auction_contract.methods.highestBid().call()
                                             .then(h_price => {
-                                                // Get EndAt
+                                                // End time
                                                 auction_contract.methods.endAt().call()
                                                     .then(endAt => {
-                                                        // Get owner
-                                                        console.log("截止时间", endAt)
-                                                        auction_contract.methods.owner().call()
-                                                            .then(owner => {
-                                                                if (owner === current_address) {
-
-                                                                    let div = document.createElement('div');
-                                                                    div.className = 'nft-item';
-
-                                                                    let img = document.createElement('img');
-                                                                    img.className = 'nft-image';
-                                                                    img.src = "images/picture-01.jpg"
-                                                                    div.appendChild(img);
-
-                                                                    let details = document.createElement('div');
-                                                                    details.className = 'nft-details';
-
-                                                                    let idDiv = document.createElement('div');
-                                                                    idDiv.textContent = 'NFT ID: ' + nftId;
-                                                                    details.appendChild(idDiv);
-
-                                                                    let h_id = document.createElement('div');
-                                                                    h_id.textContent = 'highest Bidder: ' + highestBidder;
-                                                                    details.appendChild(h_id);
-
-                                                                    let price = document.createElement('div');
-                                                                    price.textContent = 'highest price: ' + h_price;
-                                                                    
-                                                                    let span = document.createElement('span');
-                                                                    span.textContent = ' wei';
-                                                                    span.style.fontWeight = 'bold';
-                                                                    price.appendChild(span);
-                                                                    details.appendChild(price);
-
-                                                                    let end_time = document.createElement("div");
-                                                                    // endAt 1691344532
-                                                                    if (endAt === "0") {
-                                                                        endAt = "Not start";
-                                                                    }
-                                                                    endAt = new Date(parseInt(endAt) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
-
-                                                                    end_time.textContent = "end time: " + endAt;
-                                                                    details.appendChild(end_time);
-
-                                                                    let address = document.createElement('div');
-                                                                    address.textContent = 'auctionContractAddress: ' + auction_address;
-                                                                    details.appendChild(address);
-                                                                    let status = document.createElement('div');
-                                                                    status.textContent = 'status: ';
-                                                                    if (canceled) {
-                                                                        status.textContent += 'canceled ';
-                                                                    }
-                                                                    if (ended) {
-                                                                        status.textContent += 'ended ';
-                                                                    }
-                                                                    if (started) {
-                                                                        status.textContent += 'started ';
-                                                                    }
-                                                                    details.appendChild(status);
+                                                        // get started ended canceled status
+                                                        auction_contract.methods.started().call()
+                                                            .then(started => {
+                                                                auction_contract.methods.ended().call()
+                                                                    .then(ended => {
+                                                                        auction_contract.methods.canceled().call()
+                                                                            .then(canceled => {
+                                                                                auction_contract.methods.owner().call()
+                                                                                    .then(owner => {
+                                                                                        if (owner === current_address) {
+                                                                                            if (auction_num === 0) {
+                                                                                                container.removeChild(loaderWrapper);
+                                                                                            }
+                                                                                            auction_num += 1
                                                                                            
+                                                                                            let div = document.createElement('div');
+                                                                                            div.className = 'nft-item';
 
-                                                                    let buttonDiv = document.createElement('div');
-                                                                    buttonDiv.className = 'buttonDiv';
-                                                                    let startButton = document.createElement('button');
-                                                                    startButton.className = 'nft-button';
-                                                                    startButton.textContent = 'start';
-                                                                    startButton.onclick = function () {
-                                                                        console.log("click start")
-                                                                        auction_contract.methods.start().send({from: current_address})
-                                                                            .then(() => {
-                                                                                alert('Auction start success, check it in NFT market');
-                                                                            })
-                                                                            .catch(error => {
-                                                                                console.error(error);
-                                                                            })
-                                                                    }
-                                                                    buttonDiv.appendChild(startButton);
-                                                                    let endButton = document.createElement('button');
-                                                                    endButton.className = 'nft-button';
-                                                                    endButton.textContent = 'end';
-                                                                    endButton.onclick = function () {
-                                                                        console.log("click end")
-                                                                        auction_contract.methods.end().send({from: current_address})
-                                                                            .then(() => {
-                                                                                alert('Auction End success, transaction success!');
-                                                                            })
-                                                                            .catch(error => {
-                                                                                console.error(error);
-                                                                            })
-                                                                    }
-                                                                    buttonDiv.appendChild(endButton);
-                                                                    let cancelButton = document.createElement('button');
-                                                                    cancelButton.className = 'nft-button';
-                                                                    cancelButton.textContent = 'cancel';
-                                                                    cancelButton.onclick = function () {
-                                                                        console.log("click cancel")
-                                                                        auction_contract.methods.cancelAuction().send({from: current_address})
-                                                                            .then(() => {
-                                                                                alert('cancel success');
-                                                                            })
-                                                                            .catch(error => {
-                                                                                console.error(error);
-                                                                            })
-                                                                    }
-                                                                    buttonDiv.appendChild(cancelButton);
+                                                                                            let img = document.createElement('img');
+                                                                                            img.className = 'nft-image';
+                                                                                            img.src = "images/picture-01.jpg"
+                                                                                            div.appendChild(img);
+
+                                                                                            let details = document.createElement('div');
+                                                                                            details.className = 'nft-details';
+
+                                                                                            let idDiv = document.createElement('div');
+                                                                                            idDiv.textContent = 'NFT ID: ' + nftId;
+                                                                                            details.appendChild(idDiv);
+
+                                                                                            let h_id = document.createElement('div');
+                                                                                            h_id.textContent = 'highest Bidder: ' + highestBidder;
+                                                                                            details.appendChild(h_id);
+
+                                                                                            let price = document.createElement('div');
+                                                                                            price.textContent = 'highest price: ' + h_price;
+                                                                                            
+                                                                                            let span = document.createElement('span');
+                                                                                            span.textContent = ' wei';
+                                                                                            span.style.fontWeight = 'bold';
+                                                                                            price.appendChild(span);
+                                                                                            details.appendChild(price);
+
+                                                                                            let end_time = document.createElement("div");
+                                                                                            // endAt 1691344532 to string
+                                                                                            if (endAt === "0") {
+                                                                                                endAt = "Not start";
+                                                                                            }
+                                                                                            endAt = new Date(parseInt(endAt) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
+
+                                                                                            end_time.textContent = "end time: " + endAt;
+                                                                                            details.appendChild(end_time);
+
+                                                                                            let address = document.createElement('div');
+                                                                                            address.textContent = 'auctionContractAddress: ' + auction_address;
+                                                                                            details.appendChild(address);
+                                                                                            
+                                                                                            let status = document.createElement('div');
+                                                                                            status.textContent = 'status: ';
+                                                                                            if (canceled) {
+                                                                                                status.textContent += 'canceled ';
+                                                                                            }
+                                                                                            if (ended) {
+                                                                                                status.textContent += 'ended ';
+                                                                                            }
+                                                                                            if (started) {
+                                                                                                status.textContent += 'started ';
+                                                                                            }
+                                                                                            details.appendChild(status);
+
+                                                                                            let buttonDiv = document.createElement('div');
+                                                                                            buttonDiv.className = 'buttonDiv';
+                                                                                            let startButton = document.createElement('button');
+                                                                                            startButton.className = 'nft-button';
+                                                                                            startButton.textContent = 'start';
+                                                                                            startButton.onclick = function () {
+                                                                                                console.log("Click Start")
+                                                                                               
+                                                                                                if (started) {
+                                                                                                    alert('already started');
+                                                                                                    return;
+                                                                                                }
+                                                                                                auction_contract.methods.start().send({from: current_address})
+                                                                                                    .then(() => {
+                                                                                                        alert('Auction start success, check it in NFT market');
+                                                                                                    })
+                                                                                                    .catch(error => {
+                                                                                                        console.error(error);
+                                                                                                    })
+                                                                                            }
+                                                                                            buttonDiv.appendChild(startButton);
+                                                                                            let endButton = document.createElement('button');
+                                                                                            endButton.className = 'nft-button';
+                                                                                            endButton.textContent = 'end';
+                                                                                            endButton.onclick = function () {
+                                                                                                console.log("Click End")
+                                                                                                
+                                                                                                if (ended) {
+                                                                                                    alert('already ended');
+                                                                                                    return;
+                                                                                                }
+                                                                                                auction_contract.methods.end().send({from: current_address})
+                                                                                                    .then(() => {
+                                                                                                        alert('end success');
+                                                                                                    })
+                                                                                                    .catch(error => {
+                                                                                                        console.error(error);
+                                                                                                    })
+                                                                                            }
+                                                                                            buttonDiv.appendChild(endButton);
+                                                                                            let cancelButton = document.createElement('button');
+                                                                                            cancelButton.className = 'nft-button';
+                                                                                            cancelButton.textContent = 'cancel';
+                                                                                            cancelButton.onclick = function () {
+                                                                                                console.log("Click Cancel")
+                                                                                                if (canceled) {
+                                                                                                    alert('already canceled');
+                                                                                                    return;
+                                                                                                }
+                                                                                                auction_contract.methods.cancelAuction().send({from: current_address})
+                                                                                                    .then(() => {
+                                                                                                        alert('cancel success');
+                                                                                                    })
+                                                                                                    .catch(error => {
+                                                                                                        console.error(error);
+                                                                                                    })
+                                                                                            }
+                                                                                            buttonDiv.appendChild(cancelButton);
 
 
-                                                                    details.appendChild(buttonDiv);
+                                                                                            details.appendChild(buttonDiv);
 
 
-                                                                    div.appendChild(details);
+                                                                                            div.appendChild(details);
 
-                                                                    container.appendChild(div);
-                                                                }
+                                                                                            container.appendChild(div);
+                                                                                        }
+                                                                                    })
+                                                                            })
+                                                                    })
                                                             })
                                                             .catch(error => {
                                                                 console.error(error);
                                                             })
+                                                       
                                                     })
                                                     .catch(error => {
                                                         console.error(error);
@@ -1001,19 +1041,35 @@ async function getMyAuction() {
 
 
 async function fetchMyNFTs() {
-    // 获取所有的NFT
     var nfts = []
     if (window.ethereum) {
         const web3 = new Web3(window.ethereum);
         try {
             const contract = new web3.eth.Contract(tokenAbi, tokenAddress);
             const accounts = await web3.eth.getAccounts();
-            const current_address = accounts[0]; 
-            // Get id list
+            const current_address = accounts[0];
             let nfts = []
+            let container = document.getElementById('myNFT');
+            container.innerHTML = '';
+            let h1 = document.createElement('h1');
+            h1.textContent = 'My NFTs';
+            container.appendChild(h1);
+
+            let loaderWrapper = document.createElement('div');
+            loaderWrapper.className = 'loader-wrapper';
+            let loader = document.createElement('div');
+            loader.className = 'loader';
+            for (let i = 0; i < 4; i++) {
+                let dot = document.createElement('div');
+                dot.className = 'dot';
+                loader.appendChild(dot);
+            }
+            loaderWrapper.appendChild(loader);
+            container.appendChild(loaderWrapper);
+            // Get NFT
             contract.methods.getIdList(current_address).call()
                 .then(data => {
-                    console.log("id列表", data[0], data[1])
+                    console.log("id List", data[0], data[1])
                     ids = data[0]
                     for (let i = 0; i < ids.length; i++) {
                         nfts.push({
@@ -1023,18 +1079,15 @@ async function fetchMyNFTs() {
                             index: i
                         })
                     }
-                    let container = document.getElementById('myNFT');
-                           
-                            container.innerHTML = '';
-                            let h1 = document.createElement('h1');
-                            h1.textContent = 'My NFTs';
-                            container.appendChild(h1);
-                            if (nfts.length === 0) {
-                                let p = document.createElement('p');
-                                p.textContent = 'No NFTs minted yet.';
-                                p.style.textAlign = 'center';
-                                container.appendChild(p);
-                            }
+
+                    container.removeChild(loaderWrapper);
+                    if (nfts.length === 0) {
+                        let p = document.createElement('p');
+                        p.textContent = 'No NFTs minted yet.';
+              
+                        p.style.textAlign = 'center';
+                        container.appendChild(p);
+                    }
                     nfts.forEach(nft => {
                         let div = document.createElement('div');
                         div.className = 'nft-item';
@@ -1062,46 +1115,71 @@ async function fetchMyNFTs() {
 
                         let dutationDiv = document.createElement('div');
                         dutationDiv.className = 'nft-duration';
-                        dutationDiv.textContent = 'duration(s): ';
+                        dutationDiv.textContent = 'duration: ';
                         let dutationInput = document.createElement("input")
                         dutationInput.type = 'text';
-                        dutationInput.value = 300
+                        dutationInput.value = 20
                         dutationDiv.append(dutationInput)
                         details.appendChild(dutationDiv);
 
                         let auctionButton = document.createElement('button');
-                        auctionButton.textContent = 'Create Auction';
-
+                        auctionButton.textContent = 'Auction';
+                        
                         auctionButton.className = "nft-button";
                         auctionButton.addEventListener('click', function () {
-                            // Auction
+                           
                             console.log(nft.index);
                             const auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
 
                             const auctionData = {
-                                nft: tokenAddress, // NFT address
+                                nft: tokenAddress, // NFT Address
                                 nftId: nft.id,           // NFT ID
                                 startingBid: web3.utils.toWei($('.nft-item').eq(nft.index).find('.nft-price input').val(), 'wei'), // 起始出价
-                                auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  
-                                authorizedAddress: current_address, 
+                                auctionDuration: $('.nft-item').eq(nft.index).find('.nft-duration input').val(),  // 拍卖持续时间（例如，24小时）
+                                authorizedAddress: current_address, // 
                                 owner: current_address   // owner
                             }
-                            console.log("Auction Data", auctionData)
+                            console.log("拍卖合约创建参数", auctionData)
                             auctionFactoryContract.methods.createAuction(auctionData).send({from: current_address})
                                 .on('transactionHash', (hash) => {
                                     console.log('Transaction Hash:', hash);
                                 })
-                            
+                                // .on('data', event => {
+                                //     // 获取创建的auction地址
+                                //     new_auction_address = event.returnValues[0]
+                                //     token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+                                //     token_Contract.methods.approve(new_auction_address, nft.id).send({from: current_address})
+                                //         .on('transactionHash', function (hash) {
+                                //             console.log("Transaction hash: " + hash);
+                                //         })
+                                //         .on('confirmation', function (confirmationNumber, receipt) {
+                                //             console.log("Confirmation number: " + confirmationNumber);
+                                //         })
+                                //         .on('receipt', function (receipt) {
+                                //             console.log("approve success");
+                                //             // approve成功
+                                //             // auction_Contract = new web3.eth.Contract(auctionAbi, create_auction)
+                                //             // auction_Contract.methods.start().send({from: current_address})
+                                //             //     .then(receipt => {
+                                //             //         console.log("Auction started!", receipt);
+                                //             //     })
+                                //             //     .catch(error => {
+                                //             //         console.error(error);
+                                //             //     });
+                                //         })
+                                //         .on('error', console.error);
+                                // })
                                 .on('receipt', (receipt) => {
-                                    console.log('Receipt::', receipt);
-                                    alert('Auction create success, please approve it in your wallet!');
-                                  
+                                    console.log('Receipt:', receipt);
+                                    alert('Auction create successfully, check it in NFT market!');
+                                     
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
                                         .then(datas => {
-                                            console.log("Get address", datas)
+                                            console.log("获取创建的地址", datas)
                                             console.log("create_auction", datas[datas.length - 1])
                                             create_auction = datas[datas.length - 1]
+                                           
                                             token_Contract = new web3.eth.Contract(tokenAbi, tokenAddress);
                                             token_Contract.methods.approve(create_auction, nft.id).send({from: current_address})
                                                 .on('transactionHash', function (hash) {
@@ -1112,15 +1190,15 @@ async function fetchMyNFTs() {
                                                 })
                                                 .on('receipt', function (receipt) {
                                                     console.log("approve success");
+                                                   
                                                 })
-                                                .on('error', console.error); // Find Error
+                                                .on('error', console.error); 
                                         })
-                                    // token_contract = new web3.eth.Contract(tokenAbi, tokenAddress);
-
+                                    
                                 })
                                 .on('error', (error) => {
                                     console.error('Error:', error);
-                                    alert('Something wrong, pleace try again.');
+                                    alert('Something wrong, please try again later');
                                 });
                         });
                         details.appendChild(auctionButton);
@@ -1131,6 +1209,7 @@ async function fetchMyNFTs() {
                     });
                 })
 
+           
         } catch (error) {
             console.error(error);
         }
@@ -1143,46 +1222,62 @@ async function getNFTMarket() {
     if (window.ethereum) {
         const web3 = new Web3(window.ethereum);
         try {
+            
             await window.ethereum.request({method: 'eth_requestAccounts'});
 
             const contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
             const accounts = await web3.eth.getAccounts();
             const current_address = accounts[0]; 
+            let container = document.getElementById('nftMarket');
+            container.innerHTML = '';
+            
+            let h1 = document.createElement('h1');
+            h1.innerHTML = 'Marketplace';
+            container.appendChild(h1);
+            let loaderWrapper = document.createElement('div');
+            loaderWrapper.className = 'loader-wrapper';
+            let loader = document.createElement('div');
+            loader.className = 'loader';
+            for (let i = 0; i < 4; i++) {
+                let dot = document.createElement('div');
+                dot.className = 'dot';
+                loader.appendChild(dot);
+            }
+            loaderWrapper.appendChild(loader);
+            container.appendChild(loaderWrapper);
+
             contract.methods.getAllAuctions().call()
                 .then((datas) => {
-                    let container = document.getElementById('nftMarket');
-                    container.innerHTML = '';
-
-                    let h1 = document.createElement('h1');
-                    h1.innerHTML = 'Marketplace';
-                    container.appendChild(h1);
-                
+                    container.removeChild(loaderWrapper)
+                 
+                    console.log(datas)
                     if (datas.length === 0) {
                         let p = document.createElement('p');
                         p.innerHTML = 'No NFT';
-                        // Middle
+                      
                         p.style.textAlign = 'center';
                         container.appendChild(p);
                     }
 
+                    let auction_nft = 0
                     datas.forEach((auction_address, index) => {
                         const auction_contract = new web3.eth.Contract(auctionAbi, auction_address);
                         // Get NFT ID
                         auction_contract.methods.nftId().call()
                             .then(nftId => {
+
                                 // Get highest bidder
                                 auction_contract.methods.highestBidder().call()
                                     .then(highestBidder => {
                                         auction_contract.methods.highestBid().call()
                                             .then(h_price => {
-                                                // get end time
                                                 auction_contract.methods.endAt().call()
                                                     .then(endAt => {
                                                         // Get owner
-                                                        console.log("EndAt", endAt)
                                                         auction_contract.methods.owner().call()
                                                             .then(owner => {
                                                                 if (endAt !== '0' && endAt > Date.now() / 1000) {
+                                                                    auction_nft += 1
                                                                     
 
                                                                     let div = document.createElement('div');
@@ -1220,18 +1315,22 @@ async function getNFTMarket() {
                                                                     let ownerDiv = document.createElement('div');
                                                                     ownerDiv.textContent = 'owner: ' + owner;
                                                                     details.appendChild(ownerDiv);
-                                                                    
+                                                                     
                                                                     let input = document.createElement('input');
                                                                     input.type = 'text';
                                                                     input.placeholder = 'Enter your bid (wei)';
                                                                     input.className = 'nft-input';
                                                                     details.appendChild(input);
-                                                                    
+                                                                     
                                                                     let button = document.createElement('button');
                                                                     button.textContent = 'Bid';
                                                                     button.className = 'nft-button';
                                                                     button.onclick = function () {
-                                                                        auction_contract.methods.bid().send({"from": current_address, "value": web3.utils.toWei(input.value, 'wei')})
+                                                                        auction_contract.methods.bid().send({
+                                                                            "from": current_address,
+                                                                            "value": web3.utils.toWei(input.value, 'wei')
+                                                                        }
+                                                                        )
                                                                         alert('Bid success, please refresh the page!');
                                                                     }
                                                                     details.appendChild(button);
@@ -1240,6 +1339,7 @@ async function getNFTMarket() {
 
                                                                     container.appendChild(div);
                                                                 }
+
                                                             })
                                                             .catch(error => {
                                                                 console.error(error);
@@ -1264,6 +1364,13 @@ async function getNFTMarket() {
 
 
                     })
+                    if (auction_nft === 0) {
+                        let p = document.createElement('p');
+                        p.innerHTML = 'No NFT';
+                       
+                        p.style.textAlign = 'center';
+                        container.appendChild(p);
+                    }
                 })
 
         } catch (error) {
@@ -1276,10 +1383,9 @@ async function getNFTMarket() {
 }
 
 (() => {
-    $('#content > div').hide();  
-    $('#mintNFT').show();  
+    $('#content > div').hide(); 
+    $('#mintNFT').show();
     $('.nav-link').click(function () {
-        
         $('.nav-link').removeClass('nav-cur');
         $(this).addClass('nav-cur');
         var target = $(this).data('target');
@@ -1308,16 +1414,16 @@ async function getNFTMarket() {
         }
     });
 
+
     function handleAccountsChanged(accounts) {
         if (accounts.length === 0) {
             alert('No account connected');
         } else {
             $('#connectWallet').hide();
-            $('#walletAddress').text(accounts[0]); 
+            $('#walletAddress').text(accounts[0]); //
         }
     }
 
-   
     if (window.ethereum) {
         window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
@@ -1337,14 +1443,14 @@ async function getNFTMarket() {
 
                 const contract = new web3.eth.Contract(tokenAbi, tokenAddress);
                 const accounts = await web3.eth.getAccounts();
-                const current_address = accounts[0]; 
+                const current_address = accounts[0];
 
                 if (nftId) {
                     console.log('Minting NFT with ID:', nftId);
                     contract.methods.mint(current_address, nftId).send({from: current_address})
                         .on('transactionHash', (hash) => {
-                            console.log('Transaction Hash:', hash);
-                            alert("Create Successfully, please check it in NFT Place!")
+                            console.log('transaction Hash:', hash);
+                            alert("NFT create successfully! Please wait few seconds.")
                         })
                 } else {
                     alert('Please enter an NFT ID');
