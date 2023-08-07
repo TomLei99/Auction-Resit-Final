@@ -1266,7 +1266,7 @@ async function getNFTMarket() {
                     console.log(datas)
                     if (datas.length === 0) {
                         let p = document.createElement('p');
-                        p.innerHTML = 'No NFT';
+                        p.innerHTML = ' ';
                       
                         p.style.textAlign = 'center';
                         container.appendChild(p);
