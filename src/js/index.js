@@ -924,9 +924,11 @@ async function getMyAuction() {
                                                                                             status.textContent = 'status: ';
                                                                                             if (canceled) {
                                                                                                 status.textContent += 'canceled ';
+                                                                                                status.textContent -= 'started ';
                                                                                             }
                                                                                             if (ended) {
                                                                                                 status.textContent += 'ended ';
+                                                                                                status.textContent -= 'started ';
                                                                                             }
                                                                                             if (started) {
                                                                                                 status.textContent += 'started ';
@@ -947,7 +949,7 @@ async function getMyAuction() {
                                                                                                 }
                                                                                                 auction_contract.methods.start().send({from: current_address})
                                                                                                     .then(() => {
-                                                                                                        alert('Auction start success, check it in NFT market');
+                                                                                                        alert('Auction start success, check it in NFT market!');
                                                                                                     })
                                                                                                     .catch(error => {
                                                                                                         console.error(error);
@@ -984,7 +986,7 @@ async function getMyAuction() {
                                                                                                 }
                                                                                                 auction_contract.methods.cancelAuction().send({from: current_address})
                                                                                                     .then(() => {
-                                                                                                        alert('cancel success');
+                                                                                                        alert('cancel success, user can not bid on this auction anymore!');
                                                                                                     })
                                                                                                     .catch(error => {
                                                                                                         console.error(error);
@@ -1118,7 +1120,7 @@ async function fetchMyNFTs() {
                         dutationDiv.textContent = 'duration(s): ';
                         let dutationInput = document.createElement("input")
                         dutationInput.type = 'text';
-                        dutationInput.value = 20
+                        dutationInput.value = 300
                         dutationDiv.append(dutationInput)
                         details.appendChild(dutationDiv);
 
@@ -1171,7 +1173,7 @@ async function fetchMyNFTs() {
                                 // })
                                 .on('receipt', (receipt) => {
                                     console.log('Receipt:', receipt);
-                                    alert('Auction create successfully, check it in NFT market!');
+                                    alert('Auction create successfully, please approve it in your wallet!');
                                      
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
@@ -1329,7 +1331,7 @@ async function getNFTMarket() {
                                                                         auction_contract.methods.bid().send({ "from": current_address, "value": web3.utils.toWei(input.value, 'wei') })
                                                                         .then(function (transaction) {
                                                                             if (transaction.status) {
-                                                                                alert('Bid success');
+                                                                                alert('Bid success, please refresh the page!');
                                                                             }
                                                                         })
                                                                         .catch(function (error) {
