@@ -1382,13 +1382,7 @@ async function getNFTMarket() {
 
 
                     })
-                    if (auction_nft === 0) {
-                        let p = document.createElement('p');
-                        p.innerHTML = 'No NFT';
-                       
-                        p.style.textAlign = 'center';
-                        container.appendChild(p);
-                    }
+                
                 })
 
         } catch (error) {
