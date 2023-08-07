@@ -1326,15 +1326,17 @@ async function getNFTMarket() {
                                                                     button.textContent = 'Bid';
                                                                     button.className = 'nft-button';
                                                                     button.onclick = function () {
-                                                                        try {
-                                                                            const transaction = await auction_contract.methods.bid().send({ "from": current_address, "value": web3.utils.toWei(input.value, 'wei') });
+                                                                        auction_contract.methods.bid().send({ "from": current_address, "value": web3.utils.toWei(input.value, 'wei') })
+                                                                        .then(function (transaction) {
                                                                             if (transaction.status) {
-                                                                                alert('Bid success, please refresh the page.');
+                                                                                alert('Bid success');
                                                                             }
-                                                                        } catch (error) {
+                                                                        })
+                                                                        .catch(function (error) {
                                                                             console.error(error);
-                                                                        }
-                                                                    }
+                                                                        });
+                                                                    
+                                                                        
                                                                     }
                                                                     details.appendChild(button);
 
