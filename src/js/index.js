@@ -928,9 +928,7 @@ async function getMyAuction() {
                                                                                             } else if (ended) {
                                                                                                 status.textContent = 'Status: Ended';
                                                                                             } else if (started) {
-                                                                                                status.textContent = 'Status: In process';
-                                                                                            } else if (endAt < Date.now() / 1000) {
-                                                                                                status.textContent = 'Wait for seller to end';
+                                                                                                status.textContent = 'Status: In process, seller can end when finish';
                                                                                             } else {
                                                                                                 status.textContent = 'Status: Not Start';
                                                                                             }
