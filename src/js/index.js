@@ -922,11 +922,14 @@ async function getMyAuction() {
                                                                                             
                                                                                             let status = document.createElement('div');
                                                                                             status.textContent = 'Status: ';
-                                                                                            
+                                                                                            let currentTime = Math.floor(Date.now() / 1000);
+
                                                                                             if (canceled) {
                                                                                                 status.textContent = 'Status: Canceled';
                                                                                             } else if (ended) {
                                                                                                 status.textContent = 'Status: Ended';
+                                                                                            } else if (currentTime > endAt) {
+                                                                                                status.textContent = 'Status: Wait for seller to end';
                                                                                             } else if (started) {
                                                                                                 status.textContent = 'Status: Started';
                                                                                             }
