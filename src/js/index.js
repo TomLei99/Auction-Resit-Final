@@ -927,7 +927,7 @@ async function getMyAuction() {
                                                                                                 status.textContent = 'Status: Canceled';
                                                                                             } else if (ended) {
                                                                                                 status.textContent = 'Status: Ended';
-                                                                                            } else if (started && Date.now() / 1000 <= endAt) {
+                                                                                            } else if (started) {
                                                                                                 status.textContent = 'Status: In process';
                                                                                             } else {
                                                                                                 status.textContent = 'Status: Not Start';
@@ -1178,7 +1178,7 @@ async function fetchMyNFTs() {
                                     factory_Contract = new web3.eth.Contract(auctionFactoryAbi, auctionFactoryAddress);
                                     factory_Contract.methods.getAllAuctions().call()
                                         .then(datas => {
-                                            console.log("获取创建的地址", datas)
+                                            console.log("Get address", datas)
                                             console.log("create_auction", datas[datas.length - 1])
                                             create_auction = datas[datas.length - 1]
                                            
@@ -1192,6 +1192,7 @@ async function fetchMyNFTs() {
                                                 })
                                                 .on('receipt', function (receipt) {
                                                     console.log("approve success");
+                                                    alert("Auction Approval Success! Check it in My Auction.");
                                                    
                                                 })
                                                 .on('error', console.error); 
