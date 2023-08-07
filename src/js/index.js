@@ -827,6 +827,7 @@ async function getMyAuction() {
             container.appendChild(h1);
             let subtitle = document.createElement('h2');
             subtitle.textContent = 'Track and manage your ongoing auctions!'; // Change this to your desired subtitle
+            subtitle.style.textAlign = 'center';
             container.appendChild(subtitle);
 
             let loaderWrapper = document.createElement('div');
@@ -1063,6 +1064,7 @@ async function fetchMyNFTs() {
             // Add a subtitle
             let subtitle = document.createElement('h2');
             subtitle.textContent = 'Manage your NFTs and create auction here!'; // Change this to your desired subtitle
+            subtitle.style.textAlign = 'center';
             container.appendChild(subtitle);
 
             let loaderWrapper = document.createElement('div');
