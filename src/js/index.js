@@ -921,18 +921,16 @@ async function getMyAuction() {
                                                                                             details.appendChild(address);
                                                                                             
                                                                                             let status = document.createElement('div');
-                                                                                            status.textContent = 'status: ';
+                                                                                            status.textContent = 'Status: ';
+                                                                                            
                                                                                             if (canceled) {
-                                                                                                status.textContent += 'canceled ';
-                                                                                                status.textContent -= 'started ';
+                                                                                                status.textContent = 'Status: Canceled';
+                                                                                            } else if (ended) {
+                                                                                                status.textContent = 'Status: Ended';
+                                                                                            } else if (started) {
+                                                                                                status.textContent = 'Status: Started';
                                                                                             }
-                                                                                            if (ended) {
-                                                                                                status.textContent += 'ended ';
-                                                                                                status.textContent -= 'started ';
-                                                                                            }
-                                                                                            if (started) {
-                                                                                                status.textContent += 'started ';
-                                                                                            }
+                                                                                            
                                                                                             details.appendChild(status);
 
                                                                                             let buttonDiv = document.createElement('div');
